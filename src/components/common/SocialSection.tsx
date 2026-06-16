@@ -30,6 +30,7 @@ export function SocialSection() {
   const adopt = useSocialStore((s) => s.adopt);
   const totalKg = useSocialStore((s) => s.getCommunityTotalKg());
   const topRef = React.useRef<HTMLDivElement | null>(null);
+  const [isShareOpen, setIsShareOpen] = React.useState(false);
 
   return (
     <section id="social" className="py-28" aria-label="Social Carbon Swap">
@@ -77,15 +78,34 @@ export function SocialSection() {
           </CardContent>
         </Card>
 
-        <div className="mb-6">
-          <ShareEcoHackInlineForm
-            onShared={() => {
-              // Make it extremely obvious: jump user to the top of the feed.
-              requestAnimationFrame(() =>
-                topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-              );
-            }}
-          />
+        <div className="mb-6 space-y-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsShareOpen((v) => !v)}
+            aria-expanded={isShareOpen}
+            aria-controls="share-eco-hack-panel"
+            className="w-full"
+          >
+            {isShareOpen ? "Hide share form" : "Share your eco-hack"}
+          </Button>
+
+          {isShareOpen ? (
+            <div id="share-eco-hack-panel">
+              <ShareEcoHackInlineForm
+                onShared={() => {
+                  setIsShareOpen(false);
+                  // Make it obvious: jump user to the top of the feed.
+                  requestAnimationFrame(() =>
+                    topRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    }),
+                  );
+                }}
+              />
+            </div>
+          ) : null}
         </div>
 
         <div ref={topRef} />
