@@ -24,6 +24,18 @@ export default function HomePage() {
         <FeaturesSection />
         <AvatarSection />
         <section className="mx-auto max-w-6xl px-4 py-10">
+          <div className="mb-14 text-center">
+            <span className="mb-3 block font-mono text-[0.65rem] font-bold uppercase tracking-[0.15em] text-purple-400/90">
+              Feature 04
+            </span>
+            <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl">
+              AI Carbon <span className="text-purple-400">Challenges</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-slate-400">
+              Custom AI missions built for your persona — student, commuter, or office
+              worker.
+            </p>
+          </div>
           <div className="grid gap-6 md:grid-cols-2">
             <AiDetectiveCard />
             <ChallengesSection />

@@ -48,7 +48,7 @@ export function Navbar() {
       >
         <div className="flex items-center justify-between">
           <Link
-            href="#"
+            href="/"
             aria-label="CarbonMirror home"
             className="group flex items-center gap-2.5"
           >

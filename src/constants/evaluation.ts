@@ -1,3 +1,7 @@
+/**
+ * IMPORTANT: These scores are illustrative demo values.
+ * In production they would be computed server-side from live analysis.
+ */
 export const EVALUATION_DIMENSIONS = [
   {
     key: "code-quality",
