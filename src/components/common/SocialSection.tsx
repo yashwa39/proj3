@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { ShareEcoHackDialog } from "@/components/forms/ShareEcoHackDialog";
+import { ShareEcoHackInlineForm } from "@/components/forms/ShareEcoHackInlineForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,6 +29,7 @@ export function SocialSection() {
   const posts = useSocialStore((s) => s.posts);
   const adopt = useSocialStore((s) => s.adopt);
   const totalKg = useSocialStore((s) => s.getCommunityTotalKg());
+  const topRef = React.useRef<HTMLDivElement | null>(null);
 
   return (
     <section id="social" className="py-28" aria-label="Social Carbon Swap">
@@ -76,6 +77,18 @@ export function SocialSection() {
           </CardContent>
         </Card>
 
+        <div className="mb-6">
+          <ShareEcoHackInlineForm
+            onShared={() => {
+              // Make it extremely obvious: jump user to the top of the feed.
+              requestAnimationFrame(() =>
+                topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+              );
+            }}
+          />
+        </div>
+
+        <div ref={topRef} />
         <div className="space-y-4" role="feed" aria-label="Community eco-hacks feed">
           {posts.map((post, idx) => (
             <article
@@ -122,10 +135,6 @@ export function SocialSection() {
               </div>
             </article>
           ))}
-        </div>
-
-        <div className="mt-6 text-center">
-          <ShareEcoHackDialog />
         </div>
       </div>
     </section>

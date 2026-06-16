@@ -21,10 +21,16 @@ function id() {
 
 export const useToastStore = create<ToastState>((set) => ({
   toasts: [],
-  push: (toast) =>
+  push: (toast) => {
+    const toastId = id();
     set((state) => ({
-      toasts: [{ ...toast, id: id() }, ...state.toasts].slice(0, 3),
-    })),
+      toasts: [{ ...toast, id: toastId }, ...state.toasts].slice(0, 3),
+    }));
+    // Auto-dismiss so users always see "something happened".
+    setTimeout(() => {
+      set((state) => ({ toasts: state.toasts.filter((t) => t.id !== toastId) }));
+    }, 4500);
+  },
   dismiss: (toastId) =>
     set((state) => ({ toasts: state.toasts.filter((t) => t.id !== toastId) })),
 }));

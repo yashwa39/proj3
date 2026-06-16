@@ -23,3 +23,21 @@ test("homepage renders and what-if simulation works", async ({ page }) => {
       .getByText("Simulation Complete", { exact: true }),
   ).toBeVisible();
 });
+
+test("sharing an eco-hack adds it to the feed", async ({ page }) => {
+  await page.goto("/");
+  await page
+    .getByRole("heading", { name: /social carbon swap/i })
+    .scrollIntoViewIfNeeded();
+
+  await page
+    .getByPlaceholder(/walk 2km/i)
+    .fill("Just walk to the nearby shop instead of driving.");
+  await page.getByLabel(/co₂ saved/i).fill("4.4");
+  await page.getByRole("button", { name: /^share$/i }).click();
+
+  await expect(page.getByText(/your eco-hack was added/i)).toBeVisible();
+  await expect(
+    page.getByRole("feed", { name: /community eco-hacks feed/i }),
+  ).toContainText("Just walk to the nearby shop instead of driving.");
+});
