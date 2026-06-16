@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CarbonMirror — Your Future Climate Self</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js for interactivity -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT:'#22C55E', dark:'#16A34A', light:'#4ADE80' },
+            surface: { DEFAULT:'#0F172A', 2:'#1E293B', 3:'#334155' },
+            bg: '#020617',
+          },
+          fontFamily: {
+            sans: ['Inter','sans-serif'],
+            mono: ['Fira Code','monospace'],
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s ease-in-out infinite',
+            'spin-slow': 'spin 20s linear infinite',
+            'gradient': 'gradientShift 8s ease infinite',
+            'slide-up': 'slideUp 0.6s ease both',
+            'fade-in': 'fadeIn 0.8s ease both',
+            'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+            'ticker': 'ticker 0.4s ease both',
+          },
+          keyframes: {
+            float: { '0%,100%':{ transform:'translateY(0)' }, '50%':{ transform:'translateY(-12px)' } },
+            gradientShift: { '0%,100%':{ backgroundPosition:'0% 50%' }, '50%':{ backgroundPosition:'100% 50%' } },
+            slideUp: { from:{ opacity:0, transform:'translateY(30px)' }, to:{ opacity:1, transform:'translateY(0)' } },
+            fadeIn: { from:{ opacity:0 }, to:{ opacity:1 } },
+            glowPulse: { '0%,100%':{ boxShadow:'0 0 20px #22C55E33' }, '50%':{ boxShadow:'0 0 40px #22C55E66, 0 0 80px #22C55E22' } },
+            ticker: { from:{ opacity:0, transform:'translateY(8px)' }, to:{ opacity:1, transform:'translateY(0)' } },
+          },
+          backgroundSize: { '200': '200% 200%' },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    *{box-sizing:border-box}
+    html{background:#020617;scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:#020617;color:#f1f5f9;overflow-x:hidden}
+
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:#020617}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(#22C55E,#16A34A);border-radius:9999px}
+
+    /* Noise texture overlay */
+    .noise::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1}
+
+    /* Hero radial glow */
+    .hero-glow{background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(34,197,94,.18) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 80% 50%,rgba(34,197,94,.07) 0%,transparent 60%),#020617}
+
+    /* Grid */
+    .grid-bg{background-image:linear-gradient(rgba(34,197,94,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,.05) 1px,transparent 1px);background-size:60px 60px}
+
+    /* Glass morphism */
+    .glass{background:rgba(15,23,42,.75);backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5);border:1px solid rgba(34,197,94,.15)}
+    .glass-light{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.08)}
+    .glass:hover{border-color:rgba(34,197,94,.3);box-shadow:0 0 30px rgba(34,197,94,.07)}
+
+    /* Glow */
+    .glow-sm{box-shadow:0 0 20px rgba(34,197,94,.25)}
+    .glow-md{box-shadow:0 0 40px rgba(34,197,94,.2),0 0 80px rgba(34,197,94,.08)}
+    .glow-lg{box-shadow:0 0 60px rgba(34,197,94,.25),0 0 120px rgba(34,197,94,.1),inset 0 1px 0 rgba(34,197,94,.2)}
+    .text-glow{text-shadow:0 0 30px rgba(34,197,94,.6)}
+
+    /* Gradient text */
+    .gradient-text{background:linear-gradient(135deg,#22C55E 0%,#4ADE80 50%,#86EFAC 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .gradient-text-white{background:linear-gradient(135deg,#fff 0%,#cbd5e1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+    /* Scenario path styles */
+    .path-card{transition:all .3s ease}
+    .path-current{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)}
+    .path-better{border-color:rgba(234,179,8,.4);background:rgba(234,179,8,.04)}
+    .path-green-card{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.04)}
+
+    /* Range slider */
+    input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:9999px;background:linear-gradient(to right,#22C55E var(--pct,50%),#1e293b var(--pct,50%));outline:none;cursor:pointer}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#22C55E,#16A34A);box-shadow:0 0 16px rgba(34,197,94,.6);cursor:pointer;transition:transform .15s,box-shadow .15s;border:3px solid #020617}
+    input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);box-shadow:0 0 24px rgba(34,197,94,.8)}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:9999px;font-size:.7rem;font-weight:700;font-family:'Fira Code',monospace;letter-spacing:.06em;text-transform:uppercase}
+
+    /* Animated border */
+    .animated-border{position:relative}
+    .animated-border::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(135deg,#22C55E,#16A34A,#22C55E);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s}
+    .animated-border:hover::before{opacity:1}
+
+    /* Particle dots */
+    .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:#22C55E;opacity:.4;animation:float var(--dur,6s) ease-in-out infinite;animation-delay:var(--delay,0s)}
+
+    /* Card shimmer on hover */
+    .shimmer{position:relative;overflow:hidden}
+    .shimmer::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(to right,transparent,rgba(255,255,255,.04),transparent);transform:skewX(-20deg);transition:left .5s}
+    .shimmer:hover::after{left:120%}
+
+    /* Number count animation */
+    .count-tick{animation:ticker .35s ease both}
+
+    /* Section reveal */
+    .reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:none}
+
+    section{scroll-margin-top:80px}
+    .section-label{font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;font-family:'Fira Code',monospace}
+  </style>
+</head>
+
+<body class="bg-bg text-slate-100 antialiased" x-data="app()" x-init="init()">
+
+<!-- ══════════════════════════════════════
+     NAVBAR — floating glassmorphism
+══════════════════════════════════════ -->
+<nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-6xl"
+     :class="scrolled ? 'scale-[.99]' : ''"
+     x-data="{ open:false }">
+  <div class="glass rounded-2xl px-5 py-3 flex items-center justify-between transition-all duration-300"
+       :class="scrolled ? 'shadow-2xl shadow-black/40' : ''">
+
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2.5 group" aria-label="CarbonMirror home">
+      <div class="w-8 h-8 rounded-xl bg-brand/10 border border-brand/30 flex items-center justify-center group-hover:bg-brand/20 group-hover:glow-sm transition-all duration-200">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 text-brand fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+          <path d="M12 2a10 10 0 0 0-7.07 17.07" stroke-linecap="round"/>
+          <path d="M12 2v3M12 19v3M5 12H2M22 12h-3" stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke-linecap="round" opacity=".4"/>
+        </svg>
+      </div>
+      <span class="font-mono font-700 text-white text-sm tracking-tight">Carbon<span class="text-brand">Mirror</span></span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <div class="hidden md:flex items-center gap-1">
+      <a href="#problem" class="px-3 py-1.5 text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-150">Problem</a>
+      <a href="#simulator" class="px-3 py-1.5 text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-150">Simulator</a>
+      <a href="#features" class="px-3 py-1.5 text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-150">Features</a>
+      <a href="#avatar" class="px-3 py-1.5 text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-150">Avatar</a>
+      <a href="#social" class="px-3 py-1.5 text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-150">Community</a>
+    </div>
+
+    <!-- CTA -->
+    <div class="flex items-center gap-3">
+      <a href="#download"
+         class="hidden sm:flex items-center gap-2 bg-brand text-white text-xs font-700 px-4 py-2 rounded-xl glow-sm hover:bg-brand-light transition-all duration-200 cursor-pointer">
+        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 fill-none stroke-current stroke-2" aria-hidden="true"><path d="M12 16V4M12 16l-4-4M12 16l4-4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 20h18" stroke-linecap="round"/></svg>
+        Get App
+      </a>
+      <!-- Mobile burger -->
+      <button @click="open=!open" class="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" class="w-5 h-5 fill-none stroke-current stroke-2" aria-hidden="true">
+          <path x-show="!open" d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"/>
+          <path x-show="open" d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div x-show="open" x-transition class="md:hidden mt-2 glass rounded-2xl p-4 space-y-1">
+    <a href="#problem"   @click="open=false" class="block px-3 py-2 text-sm text-slate-300 hover:text-white rounded-lg hover:bg-white/5">Problem</a>
+    <a href="#simulator" @click="open=false" class="block px-3 py-2 text-sm text-slate-300 hover:text-white rounded-lg hover:bg-white/5">Simulator</a>
+    <a href="#features"  @click="open=false" class="block px-3 py-2 text-sm text-slate-300 hover:text-white rounded-lg hover:bg-white/5">Features</a>
+    <a href="#avatar"    @click="open=false" class="block px-3 py-2 text-sm text-slate-300 hover:text-white rounded-lg hover:bg-white/5">Avatar</a>
+    <a href="#social"    @click="open=false" class="block px-3 py-2 text-sm text-slate-300 hover:text-white rounded-lg hover:bg-white/5">Community</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO SECTION
+══════════════════════════════════════ -->
+<section id="hero" class="hero-glow grid-bg noise relative min-h-screen flex items-center justify-center pt-28 pb-20 px-4 overflow-hidden" aria-label="Hero">
+
+  <!-- Floating particles -->
+  <div aria-hidden="true" class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="particle" style="top:15%;left:8%;--dur:7s;--delay:0s;width:4px;height:4px;opacity:.5"></div>
+    <div class="particle" style="top:25%;left:92%;--dur:9s;--delay:1s;width:2px;height:2px"></div>
+    <div class="particle" style="top:60%;left:5%;--dur:8s;--delay:2s"></div>
+    <div class="particle" style="top:70%;left:88%;--dur:6s;--delay:.5s;width:5px;height:5px;opacity:.3"></div>
+    <div class="particle" style="top:40%;left:50%;--dur:10s;--delay:3s;width:2px;height:2px;opacity:.6"></div>
+    <div class="particle" style="top:80%;left:30%;--dur:7s;--delay:1.5s"></div>
+    <div class="particle" style="top:10%;left:65%;--dur:11s;--delay:2.5s;width:3px;height:3px"></div>
+    <!-- Orbiting ring -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-brand/5 rounded-full animate-spin-slow"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] border border-brand/[0.03] rounded-full" style="animation:spin 35s linear infinite reverse"></div>
+    <!-- Central glow blob -->
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-brand/10 rounded-full blur-[100px]"></div>
+  </div>
+
+  <div class="relative z-10 max-w-5xl mx-auto text-center">
+
+    <!-- Eyebrow badge -->
+    <div class="reveal inline-flex items-center gap-2.5 mb-8" id="hero-badge">
+      <span class="badge bg-brand/10 text-brand border border-brand/25">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand animate-pulse-slow inline-block"></span>
+        AI-Powered Climate Simulator
+      </span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="reveal text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-900 leading-[1.05] tracking-tight mb-6" id="hero-headline">
+      <span class="gradient-text-white">See the future</span><br/>
+      <span class="gradient-text text-glow">you're creating</span><br/>
+      <span class="text-slate-400 font-400 text-4xl sm:text-5xl md:text-6xl">before it happens.</span>
+    </h1>
+
+    <!-- Sub -->
+    <p class="reveal text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-400" id="hero-sub">
+      CarbonMirror doesn't just track your emissions — it shows you the exact future your lifestyle is building.
+      <span class="text-slate-300">Switch timelines. Explore paths. Change what matters.</span>
+    </p>
+
+    <!-- CTAs -->
+    <div class="reveal flex flex-col sm:flex-row gap-3 justify-center items-center mb-16" id="hero-ctas">
+      <a href="#simulator"
+         class="group flex items-center gap-2.5 bg-brand text-white font-700 px-8 py-4 rounded-2xl glow-md hover:bg-brand-light hover:glow-lg transition-all duration-250 text-sm cursor-pointer animated-border">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 fill-none stroke-current stroke-2 group-hover:translate-x-0.5 transition-transform" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/></svg>
+        See Your Future
+      </a>
+      <a href="#download"
+         class="flex items-center gap-2 glass text-slate-300 font-600 px-8 py-4 rounded-2xl hover:text-white hover:border-brand/30 transition-all duration-200 text-sm cursor-pointer">
+        Download Free
+        <svg viewBox="0 0 24 24" class="w-4 h-4 fill-none stroke-current stroke-2" aria-hidden="true"><path d="M12 16V4M12 16l-4-4M12 16l4-4" stroke-linecap="round"/><path d="M3 20h18" stroke-linecap="round"/></svg>
+      </a>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="reveal grid grid-cols-3 gap-3 max-w-md mx-auto" id="hero-stats">
+      <div class="glass-light rounded-2xl p-4 text-center shimmer animated-border">
+        <div class="font-mono font-700 text-2xl text-brand mb-0.5">7</div>
+        <div class="text-xs text-slate-500 font-500">AI features</div>
+      </div>
+      <div class="glass-light rounded-2xl p-4 text-center shimmer animated-border">
+        <div class="font-mono font-700 text-2xl text-brand mb-0.5">10yr</div>
+        <div class="text-xs text-slate-500 font-500">projections</div>
+      </div>
+      <div class="glass-light rounded-2xl p-4 text-center shimmer animated-border">
+        <div class="font-mono font-700 text-2xl text-brand mb-0.5">∞</div>
+        <div class="text-xs text-slate-500 font-500">what-ifs</div>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="mt-16 flex flex-col items-center gap-2 opacity-40" aria-hidden="true">
+      <span class="text-xs font-mono text-slate-500 tracking-widest uppercase">Scroll to explore</span>
+      <div class="w-px h-10 bg-gradient-to-b from-brand to-transparent animate-pulse"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     THE PROBLEM
+══════════════════════════════════════ -->
+<section id="problem" class="py-28 px-4" aria-label="The Problem">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="section-label text-brand/70 block mb-3">The Problem</span>
+      <h2 class="text-4xl md:text-5xl font-800 tracking-tight">Carbon is <span class="gradient-text">invisible.</span></h2>
+      <p class="text-slate-400 mt-3 max-w-lg mx-auto">Numbers like "320 kg CO₂" are meaningless. Here's the difference.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 reveal">
+      <!-- Old way -->
+      <div class="glass rounded-3xl p-8 border border-red-500/20 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-2xl"></div>
+        <div class="badge bg-red-500/10 text-red-400 border border-red-500/20 mb-5">Other apps say</div>
+        <div class="font-mono text-4xl font-700 text-slate-200 mb-2 tracking-tight">320 kg CO₂</div>
+        <p class="text-slate-500 text-sm mb-6">This month. Okay. Now what?</p>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 text-slate-500 text-sm">
+            <div class="w-5 h-5 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-3 h-3 text-red-400 fill-none stroke-current stroke-2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+            </div>
+            Invisible. Meaningless abstract numbers.
+          </div>
+          <div class="flex items-center gap-3 text-slate-500 text-sm">
+            <div class="w-5 h-5 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-3 h-3 text-red-400 fill-none stroke-current stroke-2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+            </div>
+            No connection to your daily life.
+          </div>
+          <div class="flex items-center gap-3 text-slate-500 text-sm">
+            <div class="w-5 h-5 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-3 h-3 text-red-400 fill-none stroke-current stroke-2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+            </div>
+            Generic advice. Zero behavior change.
+          </div>
+        </div>
+      </div>
+
+      <!-- New way -->
+      <div class="glass rounded-3xl p-8 border border-brand/25 glow-md relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-brand/8 rounded-full blur-3xl"></div>
+        <div class="badge bg-brand/10 text-brand border border-brand/25 mb-5">CarbonMirror says</div>
+        <div class="text-base font-600 text-slate-100 mb-4 leading-relaxed">
+          "If you continue this lifestyle for
+          <span class="text-brand font-700">5 years</span>, your emissions equal
+          <span class="text-brand font-700">12 flights</span> Delhi → London."
+        </div>
+        <div class="text-sm text-slate-400 mb-6 leading-relaxed">
+          "Take public transport twice a week — prevents emissions equal to
+          <span class="text-brand font-600">powering your home for 8 months.</span>"
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 text-slate-300 text-sm">
+            <div class="w-5 h-5 rounded-full bg-brand/15 border border-brand/30 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-3 h-3 text-brand fill-none stroke-current stroke-2.5"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Relatable. Tangible. Emotionally real.
+          </div>
+          <div class="flex items-center gap-3 text-slate-300 text-sm">
+            <div class="w-5 h-5 rounded-full bg-brand/15 border border-brand/30 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-3 h-3 text-brand fill-none stroke-current stroke-2.5"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            AI-personalised to your exact routine.
+          </div>
+          <div class="flex items-center gap-3 text-slate-300 text-sm">
+            <div class="w-5 h-5 rounded-full bg-brand/15 border border-brand/30 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-3 h-3 text-brand fill-none stroke-current stroke-2.5"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Shows your future before it happens.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURE 01 — FUTURE SIMULATOR
+══════════════════════════════════════ -->
+<section id="simulator" class="py-28 px-4" aria-label="Future Simulator" x-data="simulator()">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="section-label text-brand/70 block mb-3">Feature 01</span>
+      <h2 class="text-4xl md:text-5xl font-800 tracking-tight mb-3">Future <span class="gradient-text">Simulator</span></h2>
+      <p class="text-slate-400 max-w-xl mx-auto">Move the slider. Watch three futures collide in real time.</p>
+    </div>
+
+    <div class="glass rounded-3xl p-6 md:p-10 glow-md reveal">
+
+      <!-- Slider -->
+      <div class="mb-10">
+        <div class="flex justify-between items-center mb-4">
+          <label for="sim-slider" class="font-mono text-sm text-slate-400">Timeline Projection</label>
+          <span class="font-mono font-700 text-brand text-xl" x-text="timelineLabel" aria-live="polite"></span>
+        </div>
+        <input type="range" id="sim-slider" min="0" max="2" step="1"
+               :style="`--pct:${pct}%`"
+               x-model="timelineIdx"
+               @input="update()"
+               aria-label="Select timeline: 1 year, 5 years, or 10 years"/>
+        <div class="flex justify-between text-xs text-slate-500 font-mono mt-2">
+          <span>1 year</span><span>5 years</span><span>10 years</span>
+        </div>
+      </div>
+
+      <!-- 3 scenario cards -->
+      <div class="grid md:grid-cols-3 gap-4 mb-8">
+        <!-- Current -->
+        <div class="path-card rounded-2xl p-5 border path-current" role="article" aria-label="Current path">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-3 h-3 rounded-full bg-red-500" style="box-shadow:0 0 8px #ef4444aa" aria-hidden="true"></div>
+            <span class="font-mono text-xs font-700 text-slate-300 tracking-wider uppercase">Current Path</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <div class="text-xs text-slate-500 mb-1">CO₂ Emissions</div>
+              <div class="font-mono font-700 text-2xl text-red-400 count-tick" x-text="cur.co2" aria-live="polite"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-red-500/5 border border-red-500/10 rounded-xl p-2.5">
+                <div class="text-slate-500 mb-0.5">Cost</div>
+                <div class="font-mono text-slate-200 font-600" x-text="cur.cost"></div>
+              </div>
+              <div class="bg-red-500/5 border border-red-500/10 rounded-xl p-2.5">
+                <div class="text-slate-500 mb-0.5">Trees</div>
+                <div class="font-mono text-slate-200 font-600" x-text="cur.trees"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Better -->
+        <div class="path-card rounded-2xl p-5 border path-better" role="article" aria-label="Better path">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-3 h-3 rounded-full bg-yellow-400" style="box-shadow:0 0 8px #eab308aa" aria-hidden="true"></div>
+            <span class="font-mono text-xs font-700 text-slate-300 tracking-wider uppercase">Better Path</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <div class="text-xs text-slate-500 mb-1">CO₂ Emissions</div>
+              <div class="font-mono font-700 text-2xl text-yellow-400 count-tick" x-text="better.co2" aria-live="polite"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-yellow-400/5 border border-yellow-400/10 rounded-xl p-2.5">
+                <div class="text-slate-500 mb-0.5">Cost</div>
+                <div class="font-mono text-slate-200 font-600" x-text="better.cost"></div>
+              </div>
+              <div class="bg-yellow-400/5 border border-yellow-400/10 rounded-xl p-2.5">
+                <div class="text-slate-500 mb-0.5">Trees</div>
+                <div class="font-mono text-slate-200 font-600" x-text="better.trees"></div>
+              </div>
+            </div>
+            <div class="badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">−30% vs Current</div>
+          </div>
+        </div>
+
+        <!-- Green -->
+        <div class="path-card rounded-2xl p-5 border path-green-card glow-sm" role="article" aria-label="Green path">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-3 h-3 rounded-full bg-brand animate-glow-pulse" style="box-shadow:0 0 8px #22c55eaa" aria-hidden="true"></div>
+            <span class="font-mono text-xs font-700 text-slate-300 tracking-wider uppercase">Green Path</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <div class="text-xs text-slate-500 mb-1">CO₂ Emissions</div>
+              <div class="font-mono font-700 text-2xl text-brand count-tick" x-text="green.co2" aria-live="polite"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-brand/5 border border-brand/10 rounded-xl p-2.5">
+                <div class="text-slate-500 mb-0.5">Cost</div>
+                <div class="font-mono text-slate-200 font-600" x-text="green.cost"></div>
+              </div>
+              <div class="bg-brand/5 border border-brand/10 rounded-xl p-2.5">
+                <div class="text-slate-500 mb-0.5">Trees</div>
+                <div class="font-mono text-slate-200 font-600" x-text="green.trees"></div>
+              </div>
+            </div>
+            <div class="badge bg-brand/10 text-brand border border-brand/25">−70% vs Current</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="bg-surface/50 rounded-2xl p-4 border border-white/5">
+        <canvas id="sim-chart" height="140" role="img" aria-label="Scenario comparison chart"></canvas>
+      </div>
+
+      <p class="text-xs text-slate-600 mt-4 text-center font-mono">
+        * Green Path assumes uncommitted lifestyle changes. Results based on IPCC AR6 emission factors.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURE 02 — CARBON TIME MACHINE
+══════════════════════════════════════ -->
+<section id="features" class="py-28 px-4" aria-label="Carbon Time Machine">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="section-label text-brand/70 block mb-3">Feature 02</span>
+      <h2 class="text-4xl md:text-5xl font-800 tracking-tight mb-3">Carbon <span class="gradient-text">Time Machine</span></h2>
+      <p class="text-slate-400 max-w-xl mx-auto">320 kg CO₂ means nothing. These analogies mean everything.</p>
+    </div>
+
+    <!-- Footprint display -->
+    <div class="flex justify-center mb-8 reveal">
+      <div class="glass rounded-2xl px-10 py-5 text-center glow-sm">
+        <div class="section-label text-slate-500 mb-2">Today's footprint</div>
+        <div class="font-mono font-700 text-5xl text-white">15.0<span class="text-xl text-slate-400 ml-2">kg CO₂</span></div>
+      </div>
+    </div>
+
+    <!-- Equivalent cards -->
+    <div class="grid md:grid-cols-3 gap-5 reveal" x-data="{ active: null }">
+      <button @click="active = active===0 ? null : 0"
+              class="glass rounded-2xl p-6 text-left cursor-pointer shimmer animated-border group relative focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              :class="active===0 ? 'border-blue-400/40 glow-sm' : ''"
+              aria-label="60 km driven in a petrol car – click for source">
+        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-5 group-hover:border-blue-400/40 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 text-blue-400 fill-none stroke-current stroke-2" aria-hidden="true">
+            <path d="M1 3h15l3 5h2a2 2 0 0 1 2 2v3h-2m-3 0H2m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm13 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="font-mono font-700 text-4xl text-blue-400 mb-1">60 km</div>
+        <div class="text-slate-400 text-sm font-500">Driving a petrol car</div>
+        <div x-show="active===0" x-transition class="mt-4 pt-4 border-t border-blue-500/15 text-xs space-y-1">
+          <div class="font-mono text-brand font-600">Factor: 0.25 kg CO₂ / km</div>
+          <div class="text-slate-500">Source: IPCC AR6 WG3 (2022)</div>
+        </div>
+        <div class="absolute top-4 right-4 text-slate-600 text-xs font-mono" aria-hidden="true">tap</div>
+      </button>
+
+      <button @click="active = active===1 ? null : 1"
+              class="glass rounded-2xl p-6 text-left cursor-pointer shimmer animated-border group relative focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              :class="active===1 ? 'border-purple-400/40 glow-sm' : ''"
+              aria-label="1800 smartphone charges – click for source">
+        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-5 group-hover:border-purple-400/40 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 text-purple-400 fill-none stroke-current stroke-2" aria-hidden="true">
+            <rect x="7" y="2" width="10" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="font-mono font-700 text-4xl text-purple-400 mb-1">1,800×</div>
+        <div class="text-slate-400 text-sm font-500">Smartphone charges</div>
+        <div x-show="active===1" x-transition class="mt-4 pt-4 border-t border-purple-500/15 text-xs space-y-1">
+          <div class="font-mono text-brand font-600">Factor: 0.0083 kg CO₂ / charge</div>
+          <div class="text-slate-500">Source: EPA Emission Factors (2023)</div>
+        </div>
+        <div class="absolute top-4 right-4 text-slate-600 text-xs font-mono" aria-hidden="true">tap</div>
+      </button>
+
+      <button @click="active = active===2 ? null : 2"
+              class="glass rounded-2xl p-6 text-left cursor-pointer shimmer animated-border group relative focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              :class="active===2 ? 'border-orange-400/40 glow-sm' : ''"
+              aria-label="40 days of ceiling fan – click for source">
+        <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-5 group-hover:border-orange-400/40 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 text-orange-400 fill-none stroke-current stroke-2" aria-hidden="true">
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="font-mono font-700 text-4xl text-orange-400 mb-1">40 days</div>
+        <div class="text-slate-400 text-sm font-500">Running a ceiling fan</div>
+        <div x-show="active===2" x-transition class="mt-4 pt-4 border-t border-orange-500/15 text-xs space-y-1">
+          <div class="font-mono text-brand font-600">Factor: 0.375 kg CO₂ / day</div>
+          <div class="text-slate-500">Source: DEFRA Conversion Factors (2023)</div>
+        </div>
+        <div class="absolute top-4 right-4 text-slate-600 text-xs font-mono" aria-hidden="true">tap</div>
+      </button>
+    </div>
+    <p class="text-center text-xs text-slate-600 mt-4 font-mono">Tap any card to reveal conversion factor &amp; data source</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURES 03 + 04 — AI DETECTIVE + CHALLENGES
+══════════════════════════════════════ -->
+<section class="py-28 px-4" aria-label="AI Features">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <!-- AI Lifestyle Detective -->
+      <div class="glass rounded-3xl p-8 reveal shimmer" aria-label="AI Lifestyle Detective">
+        <span class="section-label text-brand/70 block mb-3">Feature 03</span>
+        <h3 class="text-2xl font-800 mb-2 tracking-tight">AI Lifestyle <span class="gradient-text">Detective</span></h3>
+        <p class="text-slate-400 text-sm mb-6 leading-relaxed">The AI finds hidden carbon in your routine you never even considered.</p>
+
+        <div class="space-y-4">
+          <!-- Detection card -->
+          <div class="bg-surface-2/60 rounded-2xl p-5 border border-brand/10">
+            <div class="flex items-start gap-3 mb-4">
+              <div class="w-9 h-9 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center flex-shrink-0">
+                <svg viewBox="0 0 24 24" class="w-4 h-4 text-brand fill-none stroke-current stroke-2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-700 text-slate-100 mb-1">Hidden emission detected</div>
+                <p class="text-xs text-slate-400 leading-relaxed">You drive 5 km to work daily. A metro route exists with only <span class="text-brand font-700">8 min</span> extra travel time.</p>
+              </div>
+            </div>
+            <div class="border-t border-slate-700/40 pt-4">
+              <div class="section-label text-slate-600 block mb-2">Suggested action</div>
+              <p class="text-sm text-slate-200 font-500 mb-3">
+                Take metro Mon &amp; Wed →
+                <span class="text-brand font-700">save 18.0 kg CO₂/month</span>
+                with only <span class="text-yellow-400 font-600">+16 min/week</span>
+              </p>
+              <button class="w-full py-2.5 rounded-xl bg-brand/10 border border-brand/20 text-brand text-xs font-700 hover:bg-brand hover:text-white transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label="Mark suggestion as acted on">
+                Mark as Acted On ✓
+              </button>
+            </div>
+          </div>
+
+          <!-- Second suggestion -->
+          <div class="bg-surface-2/40 rounded-2xl p-4 border border-slate-700/30 hover:border-brand/20 transition-colors cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-slate-300 font-500">Reduce AC usage by 1hr/day</div>
+              <span class="font-mono text-brand text-xs font-700">−6.5 kg/mo</span>
+            </div>
+            <div class="text-xs text-slate-600 mt-1 font-mono">+0 min extra • Easy swap</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Carbon Challenges -->
+      <div class="glass rounded-3xl p-8 reveal shimmer" aria-label="AI Carbon Challenges" x-data="challenges()">
+        <span class="section-label text-purple-400/70 block mb-3">Feature 04</span>
+        <h3 class="text-2xl font-800 mb-2 tracking-tight">AI Carbon <span class="text-purple-400">Challenges</span></h3>
+        <p class="text-slate-400 text-sm mb-6 leading-relaxed">Custom AI missions built for your persona — student, commuter, or office worker.</p>
+
+        <div class="space-y-3 mb-4" role="list">
+          <template x-for="(c, i) in items" :key="i">
+            <div class="rounded-xl p-4 border transition-all duration-200 cursor-pointer group"
+                 :class="c.done ? 'bg-brand/5 border-brand/20 opacity-60' : 'bg-surface-2/50 border-slate-700/40 hover:border-'+c.color+'/30'"
+                 role="listitem"
+                 @click="complete(i)">
+              <div class="flex items-center justify-between mb-2">
+                <span class="badge text-xs"
+                      :class="'bg-'+c.color+'/10 text-'+c.colorText+' border border-'+c.color+'/20'"
+                      x-text="c.diff"></span>
+                <span class="font-mono text-xs font-700" :class="'text-'+c.colorText" x-text="c.pts"></span>
+              </div>
+              <div class="text-sm text-slate-200 font-600 mb-1" x-text="c.label"></div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-500">Saves <span class="text-slate-300" x-text="c.saves"></span></span>
+                <span x-show="c.done" class="text-brand font-700 font-mono">✓ Done</span>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="text-xs text-slate-500">
+            Total saved: <span class="text-brand font-700 font-mono" x-text="totalSaved + ' kg CO₂'"></span>
+          </div>
+          <button @click="refresh()"
+                  class="flex items-center gap-1.5 px-3 py-2 glass-light rounded-xl text-slate-400 text-xs font-700 hover:text-white hover:border-brand/20 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 fill-none stroke-current stroke-2" aria-hidden="true"><path d="M1 4v6h6M23 20v-6h-6" stroke-linecap="round"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15" stroke-linecap="round"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURE 05 — CARBON AVATAR
+══════════════════════════════════════ -->
+<section id="avatar" class="py-28 px-4" aria-label="Carbon Avatar" x-data="avatarSection()">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="section-label text-brand/70 block mb-3">Feature 05</span>
+      <h2 class="text-4xl md:text-5xl font-800 tracking-tight mb-3">Carbon <span class="gradient-text">Avatar</span></h2>
+      <p class="text-slate-400 max-w-xl mx-auto">Your virtual ecosystem lives and dies by your choices. Feel the difference.</p>
+    </div>
+
+    <!-- 3 ecosystem states -->
+    <div class="grid md:grid-cols-3 gap-5 mb-10 reveal">
+      <!-- Polluted -->
+      <div class="glass rounded-3xl p-6 border border-red-500/20 hover:border-red-500/40 cursor-pointer group transition-all duration-300" role="article" aria-label="Polluted Forest state">
+        <div class="relative h-44 rounded-2xl mb-5 overflow-hidden bg-gradient-to-b from-red-950/40 to-slate-950">
+          <svg viewBox="0 0 200 140" class="absolute inset-0 w-full h-full" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+            <defs><radialGradient id="smoke" cx="50%" cy="30%" r="50%"><stop offset="0%" stop-color="#7f1d1d" stop-opacity=".4"/><stop offset="100%" stop-color="#0c0202" stop-opacity="0"/></radialGradient></defs>
+            <rect width="200" height="140" fill="#0c0202"/>
+            <ellipse cx="100" cy="145" rx="120" ry="25" fill="#1a0505"/>
+            <circle cx="100" cy="50" r="60" fill="url(#smoke)"/>
+            <!-- dead trees -->
+            <line x1="35" y1="140" x2="35" y2="55" stroke="#5a1a1a" stroke-width="6" stroke-linecap="round"/>
+            <line x1="35" y1="55" x2="18" y2="75" stroke="#4a1414" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="72" x2="55" y2="62" stroke="#4a1414" stroke-width="2" stroke-linecap="round"/>
+            <line x1="100" y1="140" x2="100" y2="42" stroke="#4a1010" stroke-width="8" stroke-linecap="round"/>
+            <line x1="100" y1="42" x2="70" y2="65" stroke="#3a0e0e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="100" y1="60" x2="130" y2="48" stroke="#3a0e0e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="162" y1="140" x2="162" y2="65" stroke="#5a1a1a" stroke-width="5" stroke-linecap="round"/>
+            <line x1="162" y1="65" x2="145" y2="82" stroke="#4a1414" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="78" cy="22" rx="28" ry="10" fill="#2a1010" opacity=".7"/>
+            <ellipse cx="118" cy="16" rx="22" ry="8" fill="#1f0a0a" opacity=".6"/>
+          </svg>
+          <div class="absolute bottom-3 left-0 right-0 text-center">
+            <span class="font-mono text-xs text-red-400 font-700 bg-black/50 px-2 py-0.5 rounded-full">Score: 85th %ile</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <div class="w-3 h-3 rounded-full bg-red-500" aria-hidden="true"></div>
+          <span class="font-700 text-slate-100">Polluted Forest</span>
+        </div>
+        <p class="text-sm text-slate-500">High emissions. The ecosystem suffers.</p>
+        <div class="mt-2 font-mono text-xs text-red-400">Score &gt; 70th percentile</div>
+      </div>
+
+      <!-- Grassland -->
+      <div class="glass rounded-3xl p-6 border border-yellow-500/20 hover:border-yellow-500/40 cursor-pointer group transition-all duration-300" role="article" aria-label="Grassland state">
+        <div class="relative h-44 rounded-2xl mb-5 overflow-hidden bg-gradient-to-b from-yellow-950/30 to-slate-950">
+          <svg viewBox="0 0 200 140" class="absolute inset-0 w-full h-full" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+            <rect width="200" height="140" fill="#090e06"/>
+            <rect x="0" y="95" width="200" height="45" fill="#1a2a0e"/>
+            <ellipse cx="100" cy="145" rx="130" ry="20" fill="#1f3212"/>
+            <!-- grass tufts -->
+            <path d="M5 95 Q12 72 19 95" fill="#2d4a18" /><path d="M22 95 Q30 68 38 95" fill="#3a5a20" />
+            <path d="M42 95 Q50 75 58 95" fill="#2d4a18" /><path d="M62 95 Q72 62 82 95" fill="#3a5a20" />
+            <path d="M88 95 Q96 70 104 95" fill="#2d4a18" /><path d="M110 95 Q120 65 130 95" fill="#3a5a20" />
+            <path d="M136 95 Q144 72 152 95" fill="#2d4a18" /><path d="M158 95 Q166 78 174 95" fill="#3a5a20" />
+            <path d="M178 95 Q185 75 192 95" fill="#2d4a18" />
+            <!-- shrubs -->
+            <ellipse cx="55" cy="88" rx="20" ry="13" fill="#3a5a20"/>
+            <ellipse cx="145" cy="86" rx="24" ry="16" fill="#2d4a18"/>
+            <ellipse cx="100" cy="82" rx="18" ry="11" fill="#305218"/>
+          </svg>
+          <div class="absolute bottom-3 left-0 right-0 text-center">
+            <span class="font-mono text-xs text-yellow-400 font-700 bg-black/50 px-2 py-0.5 rounded-full">Score: 50th %ile</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <div class="w-3 h-3 rounded-full bg-yellow-400" aria-hidden="true"></div>
+          <span class="font-700 text-slate-100">Grassland</span>
+        </div>
+        <p class="text-sm text-slate-500">Moderate emissions. Progress is growing.</p>
+        <div class="mt-2 font-mono text-xs text-yellow-400">Score 30th–70th percentile</div>
+      </div>
+
+      <!-- Thriving Forest -->
+      <div class="glass rounded-3xl p-6 border border-brand/25 glow-md cursor-pointer group transition-all duration-300" role="article" aria-label="Thriving Forest state">
+        <div class="relative h-44 rounded-2xl mb-5 overflow-hidden bg-gradient-to-b from-green-950/50 to-slate-950">
+          <svg viewBox="0 0 200 140" class="absolute inset-0 w-full h-full" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+            <defs><radialGradient id="glow-g" cx="50%" cy="70%" r="60%"><stop offset="0%" stop-color="#22c55e" stop-opacity=".12"/><stop offset="100%" stop-color="#022c11" stop-opacity="0"/></radialGradient></defs>
+            <rect width="200" height="140" fill="#030f05"/>
+            <rect x="0" y="95" width="200" height="45" fill="#112a0a"/>
+            <!-- thick canopy -->
+            <ellipse cx="25" cy="90" rx="24" ry="16" fill="#1a4810"/>
+            <ellipse cx="60" cy="82" rx="32" ry="22" fill="#1f5a14"/>
+            <ellipse cx="100" cy="78" rx="40" ry="28" fill="#226012"/>
+            <ellipse cx="148" cy="82" rx="34" ry="20" fill="#1a4810"/>
+            <ellipse cx="183" cy="90" rx="22" ry="15" fill="#1f5a14"/>
+            <!-- tall trees -->
+            <line x1="48" y1="140" x2="48" y2="28" stroke="#2d5a14" stroke-width="6" stroke-linecap="round"/>
+            <polygon points="26,62 48,8 70,62" fill="#22701a" opacity=".95"/>
+            <polygon points="30,78 48,28 66,78" fill="#28801f" opacity=".8"/>
+            <line x1="152" y1="140" x2="152" y2="22" stroke="#2d5a14" stroke-width="7" stroke-linecap="round"/>
+            <polygon points="128,60 152,5 176,60" fill="#22701a" opacity=".95"/>
+            <polygon points="132,76 152,22 172,76" fill="#28801f" opacity=".8"/>
+            <circle cx="100" cy="65" r="50" fill="url(#glow-g)"/>
+          </svg>
+          <div class="absolute bottom-3 left-0 right-0 text-center">
+            <span class="font-mono text-xs text-brand font-700 bg-black/50 px-2 py-0.5 rounded-full">Score: 18th %ile ✓</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <div class="w-3 h-3 rounded-full bg-brand animate-pulse" aria-hidden="true"></div>
+          <span class="font-700 text-slate-100">Thriving Forest</span>
+        </div>
+        <p class="text-sm text-slate-500">Low emissions. Your world flourishes.</p>
+        <div class="mt-2 font-mono text-xs text-brand">Score &lt; 30th percentile</div>
+      </div>
+    </div>
+
+    <!-- Score slider demo -->
+    <div class="glass rounded-2xl p-6 max-w-lg mx-auto reveal">
+      <label for="avatar-slider" class="font-mono text-sm text-slate-400 block mb-4">Try adjusting your Carbon Score</label>
+      <input type="range" id="avatar-slider" min="0" max="100" :value="score"
+             :style="`--pct:${score}%`"
+             @input="score=parseInt($event.target.value)"
+             aria-label="Carbon score" :aria-valuenow="score"/>
+      <div class="flex justify-between items-center mt-3">
+        <span class="text-xs font-mono text-slate-600">Low emissions</span>
+        <span class="font-mono font-700 text-sm transition-all duration-300"
+              :class="score<30?'text-brand':score<=70?'text-yellow-400':'text-red-400'"
+              x-text="score<30?'🌳 Thriving Forest':score<=70?'🌿 Grassland':'🏭 Polluted Forest'"
+              aria-live="polite"></span>
+        <span class="text-xs font-mono text-slate-600">High emissions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURE 06 — WHAT-IF SCANNER
+══════════════════════════════════════ -->
+<section class="py-28 px-4" aria-label="What-If Scanner" x-data="whatIf()">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="section-label text-blue-400/70 block mb-3">Feature 06</span>
+      <h2 class="text-4xl md:text-5xl font-800 tracking-tight mb-3">What-If <span class="text-blue-400">Scanner</span></h2>
+      <p class="text-slate-400 max-w-xl mx-auto">Ask any question about your lifestyle. Get the future in seconds.</p>
+    </div>
+
+    <div class="glass rounded-3xl p-8 reveal glow-sm">
+      <!-- Input row -->
+      <div class="relative mb-5">
+        <label for="wi-input" class="sr-only">Enter your what-if question</label>
+        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 fill-none stroke-current stroke-2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
+        </div>
+        <input type="text" id="wi-input" maxlength="200"
+               x-model="query"
+               @keydown.enter="simulate()"
+               placeholder='What if I buy an electric scooter?'
+               class="w-full bg-surface-2/70 border border-slate-700/50 rounded-2xl pl-10 pr-24 py-4 text-slate-100 placeholder-slate-600 font-mono text-sm focus:outline-none focus:border-brand/50 transition-colors duration-200"
+               :class="query.length>180 ? 'border-red-500/50' : ''"
+               aria-describedby="wi-count"/>
+        <span id="wi-count" class="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs"
+              :class="query.length>180?'text-red-400':'text-slate-600'"
+              x-text="`${query.length}/200`" aria-live="polite"></span>
+      </div>
+
+      <!-- Quick pills -->
+      <div class="flex flex-wrap gap-2 mb-6" role="group" aria-label="Quick what-if suggestions">
+        <button @click="query='What if I buy an electric scooter?';result=null" class="badge bg-surface-2/80 text-slate-400 border border-slate-700/50 hover:text-white hover:border-brand/30 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">Electric scooter</button>
+        <button @click="query='What if I stop eating meat twice a week?';result=null" class="badge bg-surface-2/80 text-slate-400 border border-slate-700/50 hover:text-white hover:border-brand/30 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">Less meat</button>
+        <button @click="query='What if I install solar panels?';result=null" class="badge bg-surface-2/80 text-slate-400 border border-slate-700/50 hover:text-white hover:border-brand/30 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">Solar panels</button>
+        <button @click="query='What if I work from home 3 days a week?';result=null" class="badge bg-surface-2/80 text-slate-400 border border-slate-700/50 hover:text-white hover:border-brand/30 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">Work from home</button>
+      </div>
+
+      <!-- CTA -->
+      <button @click="simulate()"
+              :disabled="loading || !query.trim()"
+              class="w-full py-4 bg-blue-500/10 border border-blue-500/25 text-blue-300 font-700 rounded-2xl hover:bg-blue-500 hover:text-white transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+        <span x-show="!loading">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current inline mr-1" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Simulate
+        </span>
+        <span x-show="loading" class="flex items-center gap-2">
+          <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+          Simulating…
+        </span>
+      </button>
+
+      <!-- Result -->
+      <div x-show="result" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-0 translate-y-0"
+           class="mt-6 bg-surface-2/60 rounded-2xl p-5 border border-brand/20" role="region" aria-live="polite" aria-label="Simulation result">
+        <div class="flex items-center gap-2 mb-5">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-brand fill-none stroke-current stroke-2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-linecap="round"/><path d="M22 4 12 14.01l-3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-sm font-700 text-slate-100">Simulation Complete</span>
+          <span class="ml-auto badge bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs" x-text="result && result.cat"></span>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-slate-900/70 rounded-2xl p-3 text-center border border-brand/10">
+            <div class="text-xs text-slate-500 mb-1.5">CO₂ saved/mo</div>
+            <div class="font-mono font-700 text-brand text-lg" x-text="result && result.co2"></div>
+          </div>
+          <div class="bg-slate-900/70 rounded-2xl p-3 text-center border border-green-500/10">
+            <div class="text-xs text-slate-500 mb-1.5">Cost saved/mo</div>
+            <div class="font-mono font-700 text-green-400 text-lg" x-text="result && result.cost"></div>
+          </div>
+          <div class="bg-slate-900/70 rounded-2xl p-3 text-center border border-yellow-500/10">
+            <div class="text-xs text-slate-500 mb-1.5">Break-even</div>
+            <div class="font-mono font-700 text-yellow-400 text-lg" x-text="result && result.be"></div>
+          </div>
+        </div>
+        <button class="mt-4 w-full py-3 bg-brand/10 border border-brand/25 text-brand rounded-xl text-sm font-700 hover:bg-brand hover:text-white transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          Apply this change to my profile →
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURE 07 — SOCIAL CARBON SWAP
+══════════════════════════════════════ -->
+<section id="social" class="py-28 px-4" aria-label="Social Carbon Swap" x-data="social()">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="section-label text-pink-400/70 block mb-3">Feature 07</span>
+      <h2 class="text-4xl md:text-5xl font-800 tracking-tight mb-3">Social <span class="text-pink-400">Carbon Swap</span></h2>
+      <p class="text-slate-400 max-w-xl mx-auto">Your eco-hack could inspire thousands. Share it. Measure the collective impact.</p>
+    </div>
+
+    <!-- Community header -->
+    <div class="glass rounded-2xl p-5 mb-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 reveal" role="banner">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-brand fill-none stroke-current stroke-2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="font-700 text-slate-100 text-sm">Community Impact</div>
+          <div class="text-xs text-slate-500">Updated every 60s · <span class="text-brand">2,847 members</span></div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="font-mono font-800 text-3xl text-brand" x-text="communityKg" aria-live="polite" aria-label="Total community CO2 saved"></div>
+        <div class="text-xs text-slate-500">kg CO₂ saved together</div>
+      </div>
+    </div>
+
+    <!-- Feed -->
+    <div class="space-y-4 reveal" role="feed">
+      <template x-for="(p,i) in posts" :key="i">
+        <article class="glass rounded-2xl p-5 transition-all duration-200"
+                 :class="p.adopted ? 'border-brand/20 bg-brand/[0.02]' : ''"
+                 :aria-label="'Eco-hack post by '+p.user">
+          <div class="flex items-start gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-700 text-sm flex-shrink-0"
+                 :class="p.avatarBg" aria-hidden="true" x-text="p.initial"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="font-700 text-slate-100 text-sm" x-text="p.user"></span>
+                <span class="badge text-xs" :class="p.tagCls" x-text="p.tag"></span>
+              </div>
+              <p class="text-slate-400 text-sm leading-relaxed" x-text="p.text"></p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4 text-xs text-slate-500">
+              <span class="font-mono font-700 text-brand" x-text="'−'+p.saves+' kg CO₂/mo'"></span>
+              <span x-text="'· '+p.adopted_count+' adopted'"></span>
+            </div>
+            <button @click="adopt(i)"
+                    class="badge text-xs transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    :class="p.adopted ? 'bg-brand text-white border-brand cursor-default' : 'bg-brand/10 text-brand border-brand/25 hover:bg-brand hover:text-white'"
+                    :disabled="p.adopted"
+                    :aria-label="p.adopted ? 'Hack adopted' : 'Adopt this eco-hack: '+p.text">
+              <span x-text="p.adopted ? '✓ Adopted' : 'Adopt this hack'"></span>
+            </button>
+          </div>
+        </article>
+      </template>
+    </div>
+
+    <div class="mt-6 text-center reveal">
+      <button class="flex items-center gap-2 glass px-6 py-3 rounded-2xl text-brand text-sm font-700 hover:bg-brand hover:text-white border border-brand/20 hover:border-brand transition-all duration-200 cursor-pointer mx-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label="Share your eco-hack">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 fill-none stroke-current stroke-2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/></svg>
+        Share Your Eco-Hack
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     DOWNLOAD CTA
+══════════════════════════════════════ -->
+<section id="download" class="py-28 px-4" aria-label="Download">
+  <div class="max-w-3xl mx-auto">
+    <div class="glass rounded-3xl p-10 md:p-16 text-center glow-lg border border-brand/20 relative overflow-hidden reveal">
+      <!-- Glow blob -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-40 bg-brand/10 rounded-full blur-3xl -translate-y-1/2" aria-hidden="true"></div>
+      <div class="relative z-10">
+        <div class="w-16 h-16 rounded-3xl bg-brand/10 border border-brand/30 flex items-center justify-center mx-auto mb-6 animate-glow-pulse">
+          <svg viewBox="0 0 24 24" class="w-8 h-8 text-brand fill-none stroke-current stroke-2" aria-hidden="true">
+            <path d="M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
+            <path d="M12 3v4M12 17v4M5 12H2M22 12h-3" stroke-linecap="round" opacity=".5"/>
+          </svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-900 mb-4 tracking-tight">
+          What future are<br/>
+          <span class="gradient-text text-glow">you building?</span>
+        </h2>
+        <p class="text-slate-400 mb-10 max-w-md mx-auto leading-relaxed">
+          Most apps tell you what you did. CarbonMirror shows you what you're creating —
+          <span class="text-slate-200 font-500">and how to change it today.</span>
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <!-- App Store -->
+          <a href="#" class="group flex items-center gap-3 glass-light border border-slate-700/50 rounded-2xl px-5 py-3.5 hover:border-brand/30 hover:glow-sm transition-all duration-200 cursor-pointer" aria-label="Download from App Store">
+            <svg viewBox="0 0 24 24" class="w-8 h-8 text-slate-300 group-hover:text-white transition-colors flex-shrink-0" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <div class="text-left">
+              <div class="text-xs text-slate-500">Download on the</div>
+              <div class="text-sm font-700 text-slate-100">App Store</div>
+            </div>
+          </a>
+          <!-- Play Store -->
+          <a href="#" class="group flex items-center gap-3 glass-light border border-slate-700/50 rounded-2xl px-5 py-3.5 hover:border-brand/30 hover:glow-sm transition-all duration-200 cursor-pointer" aria-label="Download from Google Play">
+            <svg viewBox="0 0 24 24" class="w-8 h-8 text-slate-300 group-hover:text-white transition-colors flex-shrink-0" fill="currentColor" aria-hidden="true"><path d="M3.18 23.76c.35.19.75.2 1.12.04L15.56 12 4.3.2C3.93.04 3.53.05 3.18.24 2.46.64 2 1.42 2 2.28v19.44c0 .86.46 1.64 1.18 2.04zM16.62 13.06l2.5-1.44-2.5-1.44-1.94 1.94 1.94 1.94zM5.3 1.34l9.87 9.87-2.06 2.06-7.81-11.93zM5.3 22.66l7.81-11.93 2.06 2.06L5.3 22.66z"/></svg>
+            <div class="text-left">
+              <div class="text-xs text-slate-500">Get it on</div>
+              <div class="text-sm font-700 text-slate-100">Google Play</div>
+            </div>
+          </a>
+        </div>
+        <div class="mt-10 pt-8 border-t border-slate-800/80 flex flex-wrap justify-center gap-3 text-xs text-slate-600 font-mono">
+          <span>IPCC AR6 data</span><span class="text-slate-700">·</span>
+          <span>EPA verified</span><span class="text-slate-700">·</span>
+          <span>DEFRA factors</span><span class="text-slate-700">·</span>
+          <span>React Native</span><span class="text-slate-700">·</span>
+          <span>Node.js + Python AI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-8 px-4 border-t border-slate-800/50" role="contentinfo">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center">
+        <div class="w-2 h-2 rounded-full bg-brand"></div>
+      </div>
+      <span class="font-mono font-700 text-slate-500">Carbon<span class="text-brand">Mirror</span></span>
+      <span>© 2026</span>
+    </div>
+    <span class="font-mono hidden md:block">Code Quality · Security · Efficiency · Testing · Accessibility · Problem Statement Alignment</span>
+    <nav class="flex gap-4" aria-label="Footer">
+      <a href="#" class="hover:text-slate-400 transition-colors cursor-pointer">Privacy</a>
+      <a href="#" class="hover:text-slate-400 transition-colors cursor-pointer">Terms</a>
+      <a href="#" class="hover:text-slate-400 transition-colors cursor-pointer">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+// ── Alpine.js app root ──
+function app() {
+  return {
+    scrolled: false,
+    init() {
+      window.addEventListener('scroll', () => { this.scrolled = window.scrollY > 20 }, { passive: true });
+      // GSAP ScrollTrigger reveals
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.utils.toArray('.reveal').forEach(el => {
+        gsap.fromTo(el,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+            scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+          });
+      });
+      // Hero entrance
+      gsap.timeline()
+        .from('#hero-badge',    { opacity:0, y:20, duration:.5, delay:.1 })
+        .from('#hero-headline', { opacity:0, y:30, duration:.7, ease:'power2.out' }, '-=.2')
+        .from('#hero-sub',      { opacity:0, y:20, duration:.6 }, '-=.4')
+        .from('#hero-ctas',     { opacity:0, y:20, duration:.5 }, '-=.3')
+        .from('#hero-stats',    { opacity:0, y:20, duration:.5 }, '-=.2');
+    }
+  }
+}
+
+// ── Simulator ──
+function simulator() {
+  const data = [
+    { label:'1 year',  cur:{co2:'768.0 kg',cost:'₹19,200',trees:'38'},  better:{co2:'537.6 kg',cost:'₹13,440',trees:'27'},  green:{co2:'230.4 kg',cost:'₹5,760',trees:'12'} },
+    { label:'5 years', cur:{co2:'3,840.0 kg',cost:'₹96,000',trees:'192'}, better:{co2:'2,688.0 kg',cost:'₹67,200',trees:'134'}, green:{co2:'1,152.0 kg',cost:'₹28,800',trees:'58'} },
+    { label:'10 years',cur:{co2:'7,680.0 kg',cost:'₹1,92,000',trees:'384'}, better:{co2:'5,376.0 kg',cost:'₹1,34,400',trees:'269'}, green:{co2:'2,304.0 kg',cost:'₹57,600',trees:'115'} },
+  ];
+  return {
+    timelineIdx: 1,
+    get pct(){ return this.timelineIdx * 50 },
+    get timelineLabel(){ return data[this.timelineIdx].label },
+    get cur(){    return data[this.timelineIdx].cur },
+    get better(){ return data[this.timelineIdx].better },
+    get green(){  return data[this.timelineIdx].green },
+    chart: null,
+    update() {
+      const raw = [
+        [768,3840,7680],
+        [537.6,2688,5376],
+        [230.4,1152,2304],
+      ];
+      const i = parseInt(this.timelineIdx);
+      if(this.chart) {
+        this.chart.data.datasets[0].data = [raw[0][i],raw[1][i],raw[2][i]];
+        this.chart.update('active');
+      }
+    },
+    init() {
+      this.$nextTick(() => {
+        const ctx = document.getElementById('sim-chart');
+        if(!ctx) return;
+        this.chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Current Path','Better Path','Green Path'],
+            datasets: [{
+              label: 'CO₂ (kg)',
+              data: [3840,2688,1152],
+              backgroundColor: ['rgba(239,68,68,.25)','rgba(234,179,8,.25)','rgba(34,197,94,.25)'],
+              borderColor:     ['rgba(239,68,68,.8)','rgba(234,179,8,.8)','rgba(34,197,94,.8)'],
+              borderWidth: 2,
+              borderRadius: 10,
+              borderSkipped: false,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: true,
+            plugins: {
+              legend: { display:false },
+              tooltip: { backgroundColor:'#0f172a', borderColor:'rgba(34,197,94,.3)', borderWidth:1,
+                titleColor:'#94a3b8', bodyColor:'#22c55e', bodyFont:{family:'Fira Code',size:13}, padding:10 }
+            },
+            scales: {
+              x: { grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#64748b',font:{family:'Fira Code',size:11}} },
+              y: { grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#64748b',font:{family:'Fira Code',size:11}},
+                   beginAtZero:true }
+            },
+            animation: { duration:400, easing:'easeInOutQuart' }
+          }
+        });
+      });
+    }
+  }
+}
+
+// ── Challenges ──
+function challenges() {
+  const pool = [
+    {diff:'Easy',  color:'green',  colorText:'brand',    pts:'+45 pts', label:'Use digital notes for one week',      saves:'2.3 kg CO₂', done:false},
+    {diff:'Medium',color:'yellow', colorText:'yellow-400',pts:'+120 pts',label:'Skip one food delivery this week',   saves:'5.1 kg CO₂', done:false},
+    {diff:'Hard',  color:'red',    colorText:'red-400',   pts:'+280 pts',label:'Work remotely one extra day',         saves:'12.0 kg CO₂',done:false},
+    {diff:'Easy',  color:'green',  colorText:'brand',     pts:'+30 pts', label:'Dry clothes naturally for 1 week',   saves:'1.8 kg CO₂', done:false},
+    {diff:'Medium',color:'yellow', colorText:'yellow-400',pts:'+90 pts', label:'Cut AC by 1 hour daily for a week',  saves:'4.2 kg CO₂', done:false},
+  ];
+  return {
+    items: pool.slice(0,3),
+    get totalSaved() { return this.items.reduce((a,c)=>c.done?a+parseFloat(c.saves):a,0).toFixed(1) },
+    complete(i) {
+      if(!this.items[i].done) this.items[i].done = true;
+    },
+    refresh() {
+      const fresh = pool.filter(p=>!this.items.some(c=>c.label===p.label));
+      if(fresh.length) {
+        const idx = this.items.findIndex((c,i)=>i===0);
+        this.items.splice(0,1,{...fresh[Math.floor(Math.random()*fresh.length)],done:false});
+      }
+    }
+  }
+}
+
+// ── Avatar ──
+function avatarSection() {
+  return { score: 50 }
+}
+
+// ── What-If ──
+function whatIf() {
+  const db = {
+    scooter:  {cat:'Transport', co2:'18.4 kg',cost:'₹1,200',be:'18 mo'},
+    meat:     {cat:'Diet',      co2:'12.0 kg',cost:'₹800',  be:'N/A'},
+    solar:    {cat:'Energy',    co2:'35.0 kg',cost:'₹2,400',be:'36 mo'},
+    home:     {cat:'Transport', co2:'22.0 kg',cost:'₹1,600',be:'N/A'},
+    ac:       {cat:'Energy',    co2:'8.5 kg', cost:'₹560',  be:'N/A'},
+  };
+  return {
+    query: '',
+    result: null,
+    loading: false,
+    simulate() {
+      if(!this.query.trim()) return;
+      this.loading = true;
+      this.result = null;
+      setTimeout(() => {
+        const q = this.query.toLowerCase();
+        let r = db.ac;
+        if(q.includes('scooter')||q.includes('bike')||q.includes('ev')) r = db.scooter;
+        else if(q.includes('meat')||q.includes('veg')) r = db.meat;
+        else if(q.includes('solar')) r = db.solar;
+        else if(q.includes('home')||q.includes('remote')||q.includes('wfh')) r = db.home;
+        this.result = r;
+        this.loading = false;
+      }, 700);
+    }
+  }
+}
+
+// ── Social ──
+function social() {
+  return {
+    communityTotal: 42180.5,
+    get communityKg() { return this.communityTotal.toLocaleString('en-IN',{minimumFractionDigits:1,maximumFractionDigits:1})+' kg'; },
+    posts: [
+      {user:'@priya_delhi', initial:'P', avatarBg:'bg-gradient-to-br from-pink-500 to-purple-600',
+       tag:'Transport', tagCls:'bg-pink-500/10 text-pink-400 border border-pink-500/20',
+       text:'Switched to drying clothes naturally instead of the dryer. Saving more than expected!',
+       saves:4.2, adopted_count:312, adopted:false},
+      {user:'@rahul_blr', initial:'R', avatarBg:'bg-gradient-to-br from-blue-500 to-cyan-600',
+       tag:'Energy', tagCls:'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+       text:'Turned off devices at the power strip every night. Zero standby waste now.',
+       saves:1.8, adopted_count:891, adopted:false},
+      {user:'@meera_mum', initial:'M', avatarBg:'bg-gradient-to-br from-orange-500 to-red-500',
+       tag:'Diet', tagCls:'bg-orange-500/10 text-orange-400 border border-orange-500/20',
+       text:'One meat-free day per week for the whole family. Kids actually love the dals more now.',
+       saves:7.6, adopted_count:1204, adopted:false},
+    ],
+    adopt(i) {
+      if(this.posts[i].adopted) return;
+      this.posts[i].adopted = true;
+      this.posts[i].adopted_count++;
+      this.communityTotal += this.posts[i].saves;
+    }
+  }
+}
+</script>
+</body>
+</html>
