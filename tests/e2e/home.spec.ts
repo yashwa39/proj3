@@ -29,6 +29,7 @@ test("sharing an eco-hack adds it to the feed", async ({ page }) => {
   await page
     .getByRole("heading", { name: /social carbon swap/i })
     .scrollIntoViewIfNeeded();
+  await page.getByRole("button", { name: /share your eco-hack/i }).click();
 
   await page
     .getByPlaceholder(/walk 2km/i)
