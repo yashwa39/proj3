@@ -25,6 +25,12 @@ npm run dev
 
 See `ARCHITECTURE.md`.
 
+## Security, accessibility, performance
+
+- `SECURITY.md`
+- `ACCESSIBILITY.md`
+- `PERFORMANCE.md`
+
 ## CI
 
 GitHub Actions workflow: `.github/workflows/ci.yml` runs lint, typecheck, tests, build, and Playwright.
