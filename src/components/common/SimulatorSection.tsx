@@ -13,32 +13,11 @@ import { Bar } from "react-chartjs-2";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 import { SIMULATOR } from "@/lib/carbonMirrorData";
 import { cn } from "@/lib/utils";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
-
-function useDebouncedCallback<T extends (...args: any[]) => void>(fn: T, waitMs: number) {
-  const fnRef = React.useRef(fn);
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  React.useEffect(() => {
-    fnRef.current = fn;
-  }, [fn]);
-
-  React.useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  return React.useCallback(
-    (...args: Parameters<T>) => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => fnRef.current(...args), waitMs);
-    },
-    [waitMs],
-  );
-}
 
 export function SimulatorSection() {
   const [timelineIdx, setTimelineIdx] = React.useState(1);

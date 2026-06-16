@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
+  { href: "/dashboard", label: "Dashboard" },
   { href: "#problem", label: "Problem" },
   { href: "#simulator", label: "Simulator" },
   { href: "#features", label: "Features" },
@@ -61,13 +62,13 @@ export function Navbar() {
 
           <div className="hidden items-center gap-1 md:flex">
             {NAV_ITEMS.map((item) => (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className="rounded-lg px-3 py-1.5 text-sm text-slate-400 transition-all hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -93,13 +94,13 @@ export function Navbar() {
                 <DialogTitle className="sr-only">Navigation menu</DialogTitle>
                 <div className="flex flex-col gap-1">
                   {NAV_ITEMS.map((item) => (
-                    <a
+                    <Link
                       key={item.href}
                       href={item.href}
                       className="rounded-xl px-3 py-2 text-sm text-slate-200 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
                     >
                       {item.label}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </DialogContent>

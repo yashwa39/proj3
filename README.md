@@ -21,6 +21,11 @@ npm run dev
 - **coverage**: `npm run test:ci`
 - **e2e**: `npm run test:e2e`
 
+## Routes
+
+- `/` — public product experience
+- `/dashboard` — actionable evaluation dashboard
+
 ## Architecture
 
 See `ARCHITECTURE.md`.
@@ -30,6 +35,7 @@ See `ARCHITECTURE.md`.
 - `SECURITY.md`
 - `ACCESSIBILITY.md`
 - `PERFORMANCE.md`
+- `REFACTOR_REPORT.md`
 
 ## CI
 
